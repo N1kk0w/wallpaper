@@ -35,10 +35,11 @@
         max-width: 600px;
     }
 
-    /* Barra de pesquisa */
+    /* Barra de pesquisa (Ajustada para o padding esquerdo) */
     .search-box {
         width: 100%;
-        padding: 14px 45px;
+        /* Aumentei o padding esquerdo para dar espaço ao novo botão de lupa */
+        padding: 14px 45px 14px 50px; 
         background: rgba(20, 20, 20, 0.65);
         border: 2px solid rgba(46, 6, 121, 0.822);
         border-radius: 30px;
@@ -55,37 +56,144 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.7);
         border-color: rgba(174, 0, 255, 0.904);
     }
-
-    /* Ícone de lupa dentro da barra */
-    .icon {
+    
+    /* Ícone de lupa CLICÁVEL (agora é um botão de envio) */
+    .icon-button {
         position: absolute;
-        top: 50%;
-        left: 16px;
+        top: 53%;
+        left: 13px; /* Posição dentro do search-container */
         transform: translateY(-50%);
-        width: 22px;
-        height: 22px;
-        opacity: 0.75;
-        pointer-events: none;
-        fill: white;
+        width: 32px; /* Aumenta a área clicável */
+        height: 32px;
+        background: none;
+        border: none;
+        cursor: pointer; /* Adiciona o cursor de ponteiro */
+        padding: 0;
+        z-index: 10; /* Garante que está acima da barra de pesquisa */
     }
+
+    /* Imagem dentro do botão */
+    .icon-button img {
+        width: 50%;
+        height: 50%;
+        opacity: 0.75;
+    }
+
+    /* Estilo para o Relógio Digital */
+    #digital-clock {
+        position: absolute;
+        top: 80%; /* Posiciona acima da barra de pesquisa */
+        left: 50%;
+        transform: translateX(-50%);
+        color: #000000;
+        font-size: 4em; /* Tamanho da fonte */
+        font-weight: bold;
+        text-shadow: 0 0 50px rgba(111, 0, 255, 0.8); /* Sombra roxa sutil */
+        letter-spacing: 3px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.4); /* Fundo sutilmente escuro */
+        backdrop-filter: blur(4px); /* Efeito de desfoque */
+        z-index: 5;
+        transition: all 0.3s ease;
+    }
+
+    /* Efeito ao passar o mouse */
+    #digital-clock:hover {
+        background: rgba(18, 0, 48, 0.7);
+        text-shadow: 0 0 15px rgb(255, 255, 255);
+    }
+
 </style>
 
 </head>
 <body>
 
-<!-- Vídeo de fundo -->
 <video autoplay muted loop>
     <source src="dancedance.mp4" type="video/mp4">
 </video>
 
-<!-- Barra de pesquisa -->
+<div id="digital-clock"></div>
+
 <div class="search-container">
-    <img class="icon" src="https://cdn-icons-png.flaticon.com/512/622/622669.png">
     <form action="https://www.google.com/search" method="GET">
-        <input type="text" name="q" class="search-box" placeholder="Pesquisar na web...">
+        
+        <button type="submit" class="icon-button">
+            <img src="https://images.tcdn.com.br/files/934950/themes/13/img/settings/lupa-branca-png-3-Transparent-Images.png?8d7ce686049469b30305194db5bc6188" alt="Pesquisar">
+        </button>
+
+        <input 
+    type="text" 
+    name="q" 
+    class="search-box" 
+    id="search-input" 
+    data-placeholder="Pesquisar na web..."
+>
+        
     </form>
 </div>
 
+<script>
+    const searchInput = document.getElementById('search-input');
+    const clockElement = document.getElementById('digital-clock');
+    
+    // 1. RELÓGIO
+    function updateClock() {
+        const now = new Date();
+        // Formata a hora (HH:MM:SS) e garante dois dígitos (01, 09, 12)
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        if (clockElement) {
+             clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+    }
+
+    // Atualiza o relógio a cada 1000ms (1 segundo)
+    updateClock(); // Chama imediatamente
+    setInterval(updateClock, 1000);
+    
+    // 2. DÁ O FOCO NO INPUT ao carregar a página
+    if (searchInput) {
+        searchInput.focus();
+    }
+
+    // Função para o efeito de digitação
+    function typeEffect() {
+        // Pega a frase completa do atributo 'data-placeholder'
+        const fullText = searchInput.getAttribute('data-placeholder');
+        let i = 0;
+        
+        // Define o intervalo para a digitação (velocidade)
+        const typingInterval = setInterval(() => {
+            // Se ainda houver caracteres para digitar
+            if (i < fullText.length) {
+                // Adiciona o próximo caractere ao placeholder
+                searchInput.setAttribute('placeholder', fullText.substring(0, i + 1));
+                i++;
+            } else {
+                // Para o loop quando a frase estiver completa
+                clearInterval(typingInterval);
+                
+                // Opcional: Para repetir o efeito, você pode chamar uma função de 'apagar' aqui
+            }
+        }, 90); // 120 milissegundos por caractere
+    }
+    
+    // 3. Chama a função de digitação quando a página carrega
+    if (searchInput) {
+        typeEffect();
+    }
+
+    // Opcional: Interrompe o efeito e define o placeholder completo se o usuário começar a digitar
+    searchInput.addEventListener('input', function() {
+        searchInput.setAttribute('placeholder', searchInput.getAttribute('data-placeholder'));
+        // Você também precisaria de lógica mais complexa para parar o 'typingInterval'
+        // Mas esta linha garante que o placeholder não continue 'digitando' sobre o texto do usuário.
+    });
+
+</script>
+
 </body>
 </html>
-
