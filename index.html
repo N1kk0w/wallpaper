@@ -28,7 +28,7 @@
     .search-container {
         position: absolute;
         top: 20%;
-        left: 50%;
+        left: 47.6%;
         transform: translate(-50%, -50%);
         width: 50%;
         min-width: 280px;
@@ -38,8 +38,7 @@
     /* Barra de pesquisa (Ajustada para o padding esquerdo) */
     .search-box {
         width: 100%;
-        /* Aumentei o padding esquerdo para dar espaço ao novo botão de lupa */
-        padding: 14px 45px 14px 50px; 
+        padding: 14px 45px 14px 45px; 
         background: rgba(20, 20, 20, 0.65);
         border: 2px solid rgba(46, 6, 121, 0.822);
         border-radius: 30px;
@@ -83,7 +82,7 @@
     #digital-clock {
         position: absolute;
         top: 80%; /* Posiciona acima da barra de pesquisa */
-        left: 50%;
+        left: 50.05%;
         transform: translateX(-50%);
         color: #000000;
         font-size: 4em; /* Tamanho da fonte */
@@ -104,14 +103,78 @@
         text-shadow: 0 0 15px rgb(255, 255, 255);
     }
 
+    #theme-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(174, 0, 255, 0); /* Cor do tema principal (Roxo) */
+        color: white;
+        font-size: 24px;
+        line-height: 50px;
+        text-align: center;
+        border: 3px solid rgba(255, 255, 255, 0);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        transition: background 0.3s, transform 0.3s;
+        z-index: 100;
+    }
+
+    #theme-toggle:hover {
+        background: rgba(200, 50, 255, 0.281);
+        transform: scale(1.05);
+    }
+
+    /* Altera o vídeo de fundo (aplica filtro de cor) */
+    .alt-theme video {
+        filter: brightness(0.60) hue-rotate(180deg); /* Muda o matiz do vídeo original */
+    }
+
+    /* Altera a borda da caixa de pesquisa para verde/ciano */
+    .alt-theme .search-box {
+        border-color: rgb(255, 255, 255);
+    }
+
+    /* Altera o fundo do input ao focar */
+    .alt-theme .search-box:focus {
+        background: rgba(71, 71, 71, 0.75);
+        border-color: rgb(255, 255, 255);
+    }
+
+    /* Altera a sombra do relógio */
+    .alt-theme #digital-clock {
+        text-shadow: 0 0 10px rgb(255, 255, 255);
+    }
+
+    .alt-theme #digital-clock:hover{
+        background: rgba(255, 255, 255, 0.199);
+        text-shadow: 0 0 15px rgb(255, 255, 255);
+    }
+
+    /* Altera a cor do botão de tema */
+    .alt-theme #theme-toggle {
+        background: rgba(255, 255, 255, 0); /* Cor do novo tema */
+    }
+
+    .alt-theme #theme-toggle:hover{
+        background: rgba(255, 255, 255, 0.445);
+    }
+
 </style>
 
 </head>
-<body>
 
-<video autoplay muted loop>
-    <source src="dancedance.mp4" type="video/mp4">
+<body id="page-body">
+
+<video autoplay muted loop id="background-video">
+    <source src="dancedance.mp4" type="video/mp4" id="video-source">
 </video>
+
+<button id="theme-toggle" title="Mudar Tema">
+     
+</button>
 
 <div id="digital-clock"></div>
 
@@ -134,9 +197,52 @@
 </div>
 
 <script>
+    const pageBody = document.getElementById('page-body');
+    const themeToggle = document.getElementById('theme-toggle');
     const searchInput = document.getElementById('search-input');
     const clockElement = document.getElementById('digital-clock');
+
+    // Novos elementos para controle de vídeo
+    const videoElement = document.getElementById('background-video');
+    const videoSource = document.getElementById('video-source');
+
+    // Definição das fontes (URLs)
+    const defaultVideoSrc = "dancedance.mp4";
+    const altVideoSrc = "dancedance2.mp4";
     
+    // ==========================================================
+    // 1. FUNCIONALIDADE DE TROCA DE TEMA
+    // ==========================================================
+    function applyTheme(theme) {
+        if (theme === 'alt') {
+            pageBody.classList.add('alt-theme');
+            // Altera a fonte do vídeo para o tema alternativo
+            videoSource.src = altVideoSrc;
+            localStorage.setItem('theme', 'alt');
+        } else {
+            pageBody.classList.remove('alt-theme');
+            // Retorna a fonte do vídeo para o tema padrão
+            videoSource.src = defaultVideoSrc;
+            localStorage.setItem('theme', 'default');
+        }
+        
+        // Recarrega e reinicia o vídeo após mudar a fonte
+        videoElement.load();
+        videoElement.play();
+    }
+    
+    // Troca de tema ao clicar no botão
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = pageBody.classList.contains('alt-theme') ? 'default' : 'alt';
+        applyTheme(currentTheme);
+    });
+
+    // Carrega o tema salvo ao iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme') || 'default';
+        applyTheme(savedTheme);
+    });
+
     // 1. RELÓGIO
     function updateClock() {
         const now = new Date();
