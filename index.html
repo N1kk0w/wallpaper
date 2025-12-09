@@ -146,6 +146,8 @@
     /* Altera a sombra do relógio */
     .alt-theme #digital-clock {
         text-shadow: 0 0 10px rgb(255, 255, 255);
+        background: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px); 
     }
 
     .alt-theme #digital-clock:hover{
@@ -262,8 +264,10 @@
     
     // 2. DÁ O FOCO NO INPUT ao carregar a página
     if (searchInput) {
+    setTimeout(() => {
         searchInput.focus();
-    }
+    }, 100); // Tente 50ms, 100ms ou 200ms se necessário.
+}  
 
     // Função para o efeito de digitação
     function typeEffect() {
@@ -284,7 +288,7 @@
                 
                 // Opcional: Para repetir o efeito, você pode chamar uma função de 'apagar' aqui
             }
-        }, 90); // 120 milissegundos por caractere
+        }, 90); // 90 milissegundos por caractere
     }
     
     // 3. Chama a função de digitação quando a página carrega
